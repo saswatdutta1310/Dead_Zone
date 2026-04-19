@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>DEAD ZONE</title>
+    <link rel="stylesheet" href="/src/index.css" />
+  </head>
+  <body>
+    <!-- App Container -->
+    <div id="app-container">
+      
+      <!-- Fullscreen Flashes -->
+      <div id="flash-white" class="flash-white"></div>
+      <div id="flash-red" class="flash-red"></div>
+      
+      <!-- Background Overlays -->
+      <div class="pointer-events-none absolute inset-0 z-1 overflow-hidden">
+        <div class="scanline"></div>
+        <div class="bg-scanline-pattern"></div>
+        <div class="bg-vignette"></div>
+      </div>
+
+      <!-- Canvas Container -->
+      <div id="canvas-container">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Start Screen Overlay -->
+        <div id="start-screen">
+          <div style="margin-bottom: 3rem;">
+            <h1 class="start-title">DEAD<br class="md:hidden" /> ZONE</h1>
+            <p class="start-subtitle">Survival Arena</p>
+          </div>
+          
+          <div class="controls-grid">
+            <div class="control-box">
+              <div class="control-key">WASD</div>
+              <div class="control-desc">Movement Calibration</div>
+            </div>
+            <div class="control-box">
+              <div class="control-key">MOUSE</div>
+              <div class="control-desc">Engagement Systems</div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center" style="gap: 2rem;">
+            <button id="btn-start" class="btn-primary">Initialize System</button>
+            <div id="record-badge" class="record-badge hidden">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #eab308;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+              <span id="record-badge-2"></span>
+            </div>
+          </div>
+          <div class="version-text">DZ-SA // AR-TYPE-V1.0.4-STABLE</div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="game-over-screen" class="hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ef4444; margin-bottom: 2rem; animation: pulse-opacity 2s infinite; filter: drop-shadow(0 0 30px rgb(239, 68, 68));"><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2"></path><path d="m12.5 17-.5-1-.5 1h1z"></path><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"></path></svg>
+          <h2 style="font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; color: white; margin-bottom: 1rem; letter-spacing: -2px; text-transform: uppercase; text-decoration: line-through; text-decoration-color: #dc2626;">SYSTEM FAILED</h2>
+          <div style="width: 8rem; height: 0.25rem; background-color: #ef4444; margin-bottom: 3rem; box-shadow: 0 0 10px rgb(239,68,68);"></div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 3rem;">
+            <div>
+              <div style="color: #f87171; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 6px; margin-bottom: 0.5rem;">Final Magnitude</div>
+              <div id="final-score-text" style="font-size: clamp(3rem, 5vw, 3.75rem); font-weight: 900; color: white; font-family: var(--font-mono);">0</div>
+            </div>
+            <div>
+              <div style="color: #f87171; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 6px; margin-bottom: 0.5rem;">Waves Cleared</div>
+              <div id="final-wave-text" style="font-size: clamp(3rem, 5vw, 3.75rem); font-weight: 900; color: white; font-family: var(--font-mono);">0</div>
+            </div>
+          </div>
+
+          <div id="new-record-box" class="record-box hidden">NEW RECORD CALIBRATED</div>
+
+          <button id="btn-restart" class="btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+            REBOOT SYSTEM
+          </button>
+        </div>
+
+        <!-- HUD Layer -->
+        <div id="hud-overlay" class="hidden">
+          <div class="hud-top">
+            <!-- Integrity Status -->
+            <div class="tactical-border hud-panel" style="min-width: 180px;">
+              <div class="hud-label" style="display: flex; justify-content: space-between;">
+                <span>Integrity Status</span>
+                <span style="opacity: 0.4;">SYS-NORM</span>
+              </div>
+              <div id="hp-text" class="hud-value-neon">100 / 100 <span class="text-xs opacity-50 font-normal">UNIT</span></div>
+              <div class="hp-bar-bg">
+                <div id="hp-bar" class="hp-bar-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <!-- Wave Display -->
+            <div class="wave-display">
+              <div class="tactical-border hud-panel wave-box">
+                <div class="hud-label text-center">Sector Authority</div>
+                <div id="wave-text" class="wave-value">LVL-000</div>
+              </div>
+              <div id="deploying-box" class="deploying-badge hidden">DEPLOYING: 3S</div>
+              <div id="boss-box" class="boss-badge hidden">BOSS DETECTED</div>
+            </div>
+
+            <!-- Scores -->
+            <div class="tactical-border hud-panel score-panel">
+              <div class="hud-label">Accumulated Data</div>
+              <div id="score-text" class="hud-value-neon">0 <span style="font-size: 10px; opacity: 0.4;">PTS</span></div>
+              <div class="hud-label">Historical Max</div>
+              <div id="highscore-text" style="font-size: 1rem; font-weight: 900; color: white;">0</div>
+            </div>
+          </div>
+
+          <div class="hud-bottom">
+            <!-- Input Calibration -->
+            <div class="tactical-border hud-panel input-panel">
+              <div class="hud-label" style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span>Input Calibration</span>
+                <span class="text-neon" style="color: #60a5fa;">ACTIVE</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, 2rem); gap: 4px; margin-bottom: 0.75rem;">
+                <div style="width: 2rem; height: 2rem; border: 1px solid rgba(0,255,102,0.3); display: flex; align-items: center; justify-content: center; color: var(--neon); font-size: 0.75rem; font-weight: 700; background-color: rgba(0,255,102,0.1); box-shadow: inset 0 0 5px rgba(0,255,102,0.1);">W</div>
+                <div style="grid-column: 1; width: 2rem; height: 2rem; border: 1px solid rgba(0,255,102,0.3); display: flex; align-items: center; justify-content: center; color: var(--neon); font-size: 0.75rem; font-weight: 700;">A</div>
+                <div style="width: 2rem; height: 2rem; border: 1px solid rgba(0,255,102,0.3); display: flex; align-items: center; justify-content: center; color: var(--neon); font-size: 0.75rem; font-weight: 700; background-color: rgba(0,255,102,0.1); box-shadow: inset 0 0 5px rgba(0,255,102,0.1);">S</div>
+                <div style="width: 2rem; height: 2rem; border: 1px solid rgba(0,255,102,0.3); display: flex; align-items: center; justify-content: center; color: var(--neon); font-size: 0.75rem; font-weight: 700;">D</div>
+              </div>
+              <div style="font-size: 9px; opacity: 0.6; line-height: 1.5;">
+                <div style="display: flex; justify-content: space-between;"><span>[M1]</span> <span>HOLD FOR AUTO FIRE</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>[ESC]</span> <span>PAUSE SYSTEM</span></div>
+              </div>
+            </div>
+
+            <!-- Munitions -->
+            <div class="tactical-border hud-panel ammo-panel">
+              <div class="hud-label">Weapon Feed</div>
+              <div style="font-size: 1.5rem; font-weight: 900; color: var(--neon); margin-bottom: 0.5rem;">
+                INF <span style="opacity: 0.3; font-size: 1rem;">/ AUTO</span>
+              </div>
+              <div class="ammo-bars">
+                <div class="ammo-segment"></div><div class="ammo-segment"></div><div class="ammo-segment"></div>
+                <div class="ammo-segment"></div><div class="ammo-segment"></div><div class="ammo-segment"></div>
+                <div class="ammo-segment"></div><div class="ammo-segment"></div><div class="ammo-segment"></div>
+                <div class="ammo-segment"></div><div class="ammo-segment"></div><div class="ammo-segment"></div>
+              </div>
+              <div style="font-size: 9px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; color: var(--neon);">
+                CONTINUOUS FIRE ONLINE
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-screen" class="hidden">
+          <h2 style="font-size: 4rem; font-weight: 900; color: white; margin-bottom: 0.5rem; letter-spacing: -2px;">PAUSED</h2>
+          <p style="color: #a1a1aa; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem;">Ready to survive?</p>
+          <button id="btn-resume" style="padding: 1rem 3rem; background-color: #52b788; color: black; font-weight: 700; font-size: 1.25rem; border-radius: 9999px; border: none; cursor: pointer;">
+            RESUME
+          </button>
+        </div>
+        
+      </div>
+    </div>
+    
+    <script type="module" src="/src/index.js"></script>
+  </body>
+</html>
