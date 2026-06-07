@@ -13,7 +13,7 @@ Play it here: [https://dead-zone-nine.vercel.app/](https://dead-zone-nine.vercel
 - `index.html` and `index.css` handle the menus, overlays, HUD, and layout.
 - `index.js` drives the DOM state, interactions, and overlays.
 - A dedicated canvas `GameEngine` runs the simulation, collision checks, spawning, and rendering.
-- Gameplay tuning lives in central constants so balancing is easy to adjust.
+- Gameplay tuning lives all in central constants so balancing is easy to adjust.
 
 The result is a clean, lightning-fast application with zero transpilation overhead.
 
