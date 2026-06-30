@@ -130,7 +130,7 @@ sequenceDiagram
 ### Combat Rules
 
 - The player starts with `100` HP.
-- The primary weapon has unlimited bullets and fires continuously while the left mouse button is held.
+- The primary weapon has unlimited bullets and fires continuously while the left mouse button is pressed or held.
 - Bullets deal flat damage and deactivate on impact or when leaving the arena.
 - Zombies damage the player on contact, then invincibility frames prevent immediate repeated hits.
 
